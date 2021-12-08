@@ -1,5 +1,5 @@
-import {of, fromEvent, from, Observable} from 'rxjs';
-import {map, scan} from 'rxjs/operators';
+import {of, fromEvent, from, Observable, interval, range} from 'rxjs';
+import {map, scan, take, pluck} from 'rxjs/operators';
 
 of(1, 3, 4).pipe(
     map( x => x * x)
@@ -62,4 +62,54 @@ observableFromPromise.subscribe( data => {
     for(let key in data){
         document.body.insertAdjacentHTML('beforebegin','<p>'+data[key]+'</p>')
     }
+});
+
+const source = interval(1000);
+source.pipe(
+    scan( val => val + 3),
+    take(4)
+).subscribe(val => console.log(val));
+
+const source2 = range(1, 3);
+source2.subscribe( val => console.log('source2: ',val));
+
+
+
+
+
+const myPromise2 = new Promise((resolve, reject ) => {
+    console.log('Creating promise');
+    setTimeout( () => {
+        resolve({
+            title: 'WebDev',
+            message: 'WebDev is the best!',
+            age: 12
+        })
+    }, 3000)
+});
+
+const observableFromPromise2 = from(myPromise2);
+
+observableFromPromise2.pipe( map(data => data.age)).subscribe( data => {
+    document.body.insertAdjacentHTML('beforebegin','<p> Mapped Age: '+data+'</p>')
+});
+
+
+
+
+const myPromise3 = new Promise((resolve, reject ) => {
+    console.log('Creating promise');
+    setTimeout( () => {
+        resolve({
+            title: 'WebDev',
+            message: 'WebDev is the best!',
+            age: 12
+        })
+    }, 3000)
+});
+
+const observableFromPromise3 = from(myPromise3);
+
+observableFromPromise3.pipe( pluck('age')).subscribe( data => {
+    document.body.insertAdjacentHTML('beforebegin','<p> Plucked Age: '+data+'</p>')
 });
